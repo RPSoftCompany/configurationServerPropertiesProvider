@@ -52,8 +52,6 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
         return new ConfigurationPropertiesProvider() {
             @Override
             public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
-                LOGGER.info("Configuration server properties provider startup");
-
                 if (configurationAttributeKey.startsWith(CUSTOM_PROPERTIES_PREFIX)) {
                     String effectiveKey = configurationAttributeKey.substring(CUSTOM_PROPERTIES_PREFIX.length());
                     return Optional.of(new ConfigurationProperty() {
@@ -83,6 +81,7 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
                         }
                     });
                 }
+
                 return Optional.empty();
             }
 
@@ -97,7 +96,6 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
      * connect - connects to the given configuration server
      *
      * @param parameters - parameters from configuration provider
-     * @throws IOException - on connection issues
      */
     public void connect(ConfigurationParameters parameters) {
         String stringUrl = parameters.getStringParameter("Base_URL");
@@ -130,6 +128,8 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
                 }
                 in.close();
 
+                configurationMap = new HashMap<>();
+
                 switch (configServerType) {
                     case "Tower":
                         configurationObject = new JSONObject(response.toString());
@@ -139,8 +139,6 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
                         JSONObject obj = new JSONObject(response.toString());
                         JSONArray array = obj.getJSONArray("propertySources");
 
-                        configurationMap = new HashMap<>();
-
                         for (int i = 0; i < array.length(); i++) {
                             Map<String, Object> tempMap = array.getJSONObject(i).getJSONObject("source").toMap();
                             configurationMap.putAll(tempMap);
@@ -149,8 +147,6 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
                     }
                     case "Consul": {
                         JSONArray array = new JSONArray(response.toString());
-
-                        configurationMap = new HashMap<>();
 
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject consulObject = array.getJSONObject(i);
@@ -166,7 +162,6 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
                                 while (keys.hasNext()) {
                                     String tempKey = keys.next();
                                     String localKey = mainKey + "/" + tempKey;
-                                    localKey = localKey.replace("/", ".");
 
                                     configurationMap.put(localKey, valueObject.get(tempKey).toString());
                                 }
