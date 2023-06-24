@@ -39,7 +39,7 @@ public class ConfigurationServerPropertiesExtensionLoadingDelegate implements Ex
 
         ParameterGroupDeclarer defaultParameterGroup = configurationDeclarer.onDefaultParameterGroup();
         defaultParameterGroup
-                .withRequiredParameter("Configuration_Server").ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("Tower", "Spring Cloud Config Server", "Consul").defaultValue("Tower").build())
+                .withRequiredParameter("Configuration_Server").withDisplayModel(DisplayModel.builder().displayName("Configuration Server").build()).ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("Tower", "Spring Cloud Config Server", "Consul").defaultValue("Tower").build())
                 .withExpressionSupport(NOT_SUPPORTED)
                 .describedAs("Configuration server you use. You can choose from \"Tower Configuration Server\" (https://github.com/RPSoftCompany/tower), \"Spring Cloud Config Server\" (https://github.com/spring-cloud/spring-cloud-config) or \"Consul\" (https://github.com/hashicorp/consul)");
 
@@ -49,7 +49,7 @@ public class ConfigurationServerPropertiesExtensionLoadingDelegate implements Ex
                 .describedAs("Configuration server base URL, e.g. http://127.0.0.1:8080/v1");
 
         defaultParameterGroup
-                .withRequiredParameter("Configuration_Path").ofType(BaseTypeBuilder.create(JAVA).stringType().build())
+                .withRequiredParameter("Configuration_Path").withDisplayModel(DisplayModel.builder().displayName("Configuration path").build()).ofType(BaseTypeBuilder.create(JAVA).stringType().build())
                 .withExpressionSupport(NOT_SUPPORTED)
                 .describedAs("Configuration path, e.g. DEV/App1");
 
