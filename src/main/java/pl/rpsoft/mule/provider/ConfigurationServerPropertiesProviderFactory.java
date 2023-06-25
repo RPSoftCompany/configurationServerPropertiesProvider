@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,7 +23,7 @@ import static pl.rpsoft.mule.provider.ConfigurationServerPropertiesExtensionLoad
 import static pl.rpsoft.mule.provider.ConfigurationServerPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 /**
- * Builds the provider for a custom-properties-provider:config element.
+ * Builds the provider for a configuration-server-properties-provider:config element.
  *
  * @since 1.0
  */
@@ -38,7 +37,6 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
     private final static String CUSTOM_PROPERTIES_PREFIX = "configuration::";
 
     private boolean connected = false;
-    private JSONObject configurationObject = null;
     private Map<String, Object> configurationMap = null;
 
     @Override
@@ -93,9 +91,9 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
     }
 
     /**
-     * connect - connects to the given configuration server
+     * Connects to the given configuration server and collects all the configuration properties
      *
-     * @param parameters - parameters from configuration provider
+     * @param parameters - parameters provided by configuration provider
      */
     public void connect(ConfigurationParameters parameters) {
         String stringUrl = parameters.getStringParameter("Base_URL");
@@ -112,6 +110,8 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
         }
 
         try {
+            LOGGER.debug("Trying to connect to configuration server on " + urlBuilder);
+
             URL url = new URL(urlBuilder);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestProperty("Accept", "*/*");
@@ -119,6 +119,8 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
             con.setRequestMethod("GET");
             int responseCode = con.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                LOGGER.debug("Connection successful");
+
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String inputLine;
                 StringBuilder response = new StringBuilder();
@@ -130,9 +132,11 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
 
                 configurationMap = new HashMap<>();
 
+                LOGGER.debug("Configuration server type: " + configServerType);
+
                 switch (configServerType) {
                     case "Tower":
-                        configurationObject = new JSONObject(response.toString());
+                        JSONObject configurationObject = new JSONObject(response.toString());
                         configurationMap = configurationObject.toMap();
                         break;
                     case "Spring Cloud Config Server": {
@@ -171,15 +175,25 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
                     }
                 }
 
+                for (Map.Entry<String, Object> value : configurationMap.entrySet()) {
+                    LOGGER.debug(value.toString());
+                }
+
                 connected = true;
             } else {
                 LOGGER.error("Error connecting to configuration server: " + con.getResponseMessage());
             }
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             LOGGER.error("Error connecting to configuration server: " + exception.getMessage());
         }
     }
 
+    /**
+     * Retrieves configuration property value from configuration server
+     *
+     * @param paramName configuration parameter name
+     * @return returns configuration parameter value
+     */
     public Object getProperty(String paramName) {
         if (!connected) {
             return "";
