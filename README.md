@@ -15,9 +15,12 @@ After the installation you'll be able to add it as the dependency to your applic
 
 ```XML
 
-<groupId>pl.rpsoft.mule.provider</groupId>
-<artifactId>configuration-server-properties-provider-module</artifactId>
-<version>1.1.0</version>
+<dependency>
+    <groupId>pl.rpsoft.mule.provider</groupId>
+    <artifactId>configuration-server-properties-provider-module</artifactId>
+    <version>1.1.0</version>
+    <classifier>mule-plugin</classifier>
+</dependency>
 ```
 
 This operation will add and additional connector you can choose from called **Configuration Server Properties Provider
