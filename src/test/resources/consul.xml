@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:configuration-server-properties-provider="http://www.mulesoft.org/schema/mule/configuration-server-properties-provider"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+http://www.mulesoft.org/schema/mule/configuration-server-properties-provider http://www.mulesoft.org/schema/mule/configuration-server-properties-provider/current/mule-configuration-server-properties-provider.xsd
+
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <configuration-server-properties-provider:config name="Configuration_Server_Properties_Provider_Config"
+                                                     Configuration_Server="Consul"
+                                                     doc:name="Configuration Server Properties Provider Config"
+                                                     doc:id="61692313-9c66-4106-a497-96c8ca33a718"
+                                                     Base_URL="http://localhost:8500/v1/kv"
+                                                     Configuration_Path="test/test"/>
+    <flow name="sccsFlow" doc:id="df8784c7-14d0-4e65-92d8-ca3fd91ab024">
+        <set-payload doc:name="Set Payload" doc:id="8ddc646c-2074-4f7a-b5e1-4e9694fc6af8"
+                     value="${configuration::test/test/number}"/>
+        <logger level="INFO" doc:name="Logger" doc:id="c7849453-5d6c-4b5a-98fe-348aabfb4444" message="#[payload]"/>
+    </flow>
+</mule>

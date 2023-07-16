@@ -115,7 +115,9 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
             URL url = new URL(urlBuilder);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestProperty("Accept", "*/*");
-            con.setRequestProperty(headerName, headerValue);
+            if (headerName != null) {
+                con.setRequestProperty(headerName, headerValue);
+            }
             con.setRequestMethod("GET");
             int responseCode = con.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -181,7 +183,7 @@ public class ConfigurationServerPropertiesProviderFactory implements Configurati
 
                 connected = true;
             } else {
-                LOGGER.error("Error connecting to configuration server: " + con.getResponseMessage());
+                LOGGER.error("Invalid response from configuration server: " + con.getResponseMessage());
             }
         } catch (Exception exception) {
             LOGGER.error("Error connecting to configuration server: " + exception.getMessage());
